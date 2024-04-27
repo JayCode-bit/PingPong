@@ -7,7 +7,7 @@ global_variable bool running = true;
 struct Render_State
 {
 	void* memory; // Buffer Memory
-	int height, width; 
+	int height, width;
 	BITMAPINFO bitmap_info; //pixel info about how its look like or compression info and how to copy that to video card
 };
 //Now make this struct as a global variable
@@ -20,59 +20,59 @@ global_variable Render_State render_state;
 #include "game.cpp"
 
 //callBack function ; is the way windows use to pass messages down to us
-LRESULT CALLBACK window_callback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
+LRESULT CALLBACK window_callback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	LRESULT result = 0;
 
-	switch (uMsg) 
+	switch (uMsg)
 	{
-		case WM_CLOSE:
-		case WM_DESTROY: 
-		{
-			running = false;
-		} break;
+	case WM_CLOSE:
+	case WM_DESTROY:
+	{
+		running = false;
+	} break;
 
-		// in case we receive (WM)Window size message : that the window changed size
-		case WM_SIZE: 
-		{
-			//now we must know the new size by getting the clients Rect
-			//this function takes the window and a pointer to a rect struct to attain the left/right,  up/bottom values
-			RECT rect;
-			GetClientRect(hwnd, &rect);
-			render_state.width = rect.right - rect.left;
-			render_state.height = rect.bottom - rect.top;
-			//now our buffer contains width times height pixels: number_of_pixels = w*h
-			//render_state.size =  number_of_pixels * sizeof(pixel)
+	// in case we receive (WM)Window size message : that the window changed size
+	case WM_SIZE:
+	{
+		//now we must know the new size by getting the clients Rect
+		//this function takes the window and a pointer to a rect struct to attain the left/right,  up/bottom values
+		RECT rect;
+		GetClientRect(hwnd, &rect);
+		render_state.width = rect.right - rect.left;
+		render_state.height = rect.bottom - rect.top;
+		//now our buffer contains width times height pixels: number_of_pixels = w*h
+		//render_state.size =  number_of_pixels * sizeof(pixel)
 
-			int size = render_state.width * render_state.height * sizeof(unsigned int);
+		int size = render_state.width * render_state.height * sizeof(unsigned int);
 
-			//what if the player changed the size again, in our case we already have allocated memory
-			// we have to check if our pointer already has some value memory and if does free it first before allocating new memory
-			if (render_state.memory)
-				VirtualFree(render_state.memory,0,MEM_RELEASE);
+		//what if the player changed the size again, in our case we already have allocated memory
+		// we have to check if our pointer already has some value memory and if does free it first before allocating new memory
+		if (render_state.memory)
+			VirtualFree(render_state.memory, 0, MEM_RELEASE);
 
-			/* Asking windows for a new HEAP memory, for clearing and reallocating different window sizes in that memory
-			   VirtualAlloc(); takes you to the address we want to create.
-			   the memory you're gonna take is void pointer, which means it's a pointer to somwhere in the memory */
+		/* Asking windows for a new HEAP memory, for clearing and reallocating different window sizes in that memory
+		   VirtualAlloc(); takes you to the address we want to create.
+		   the memory you're gonna take is void pointer, which means it's a pointer to somwhere in the memory */
 
-			render_state.memory = VirtualAlloc(0, size, MEM_COMMIT | MEM_RESERVE , PAGE_READWRITE);
+		render_state.memory = VirtualAlloc(0, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
 
-			//BITMAPINFOHEADER structure which contains information about the dimentions and color format of a DIB
-			render_state.bitmap_info.bmiHeader.biSize = sizeof(render_state.bitmap_info.bmiHeader); //size
-			render_state.bitmap_info.bmiHeader.biWidth = render_state.width;
-			render_state.bitmap_info.bmiHeader.biHeight = render_state.height;
-			render_state.bitmap_info.bmiHeader.biPlanes = 1; // planes should be 1 for some reason
-			render_state.bitmap_info.bmiHeader.biBitCount = 32; // remember 32bit unsigned integer
-			render_state.bitmap_info.bmiHeader.biCompression = BI_RGB; //compression
+		//BITMAPINFOHEADER structure which contains information about the dimentions and color format of a DIB
+		render_state.bitmap_info.bmiHeader.biSize = sizeof(render_state.bitmap_info.bmiHeader); //size
+		render_state.bitmap_info.bmiHeader.biWidth = render_state.width;
+		render_state.bitmap_info.bmiHeader.biHeight = render_state.height;
+		render_state.bitmap_info.bmiHeader.biPlanes = 1; // planes should be 1 for some reason
+		render_state.bitmap_info.bmiHeader.biBitCount = 32; // remember 32bit unsigned integer
+		render_state.bitmap_info.bmiHeader.biCompression = BI_RGB; //compression
 
-		}
-		break;
+	}
+	break;
 
-		default:
-		{
-			result = DefWindowProc(hwnd, uMsg, wParam, lParam);
-		}
+	default:
+	{
+		result = DefWindowProc(hwnd, uMsg, wParam, lParam);
+	}
 
 	}
 
@@ -81,7 +81,7 @@ LRESULT CALLBACK window_callback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 
 //entry point for graphical windows based application
-int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) 
+int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 	//First thing to do is to show a window so we can draw on that
 	//In order to draw a window on windows we need 03 things
@@ -90,7 +90,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	WNDCLASS window_class = {}; // empty class
 
 	//this will make sure that we redraw the window Horizantally and Vertically whenever we want
-	window_class.style = CS_HREDRAW | CS_VREDRAW; 
+	window_class.style = CS_HREDRAW | CS_VREDRAW;
 
 	//Class Name STRING to identify our window class; not visible to the normal user
 	window_class.lpszClassName = "Game Window Class";
@@ -103,7 +103,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	//Before creating a window of a specific class, your application must register that class 
 	// using either RegisterClassA (for ANSI character set) or RegisterClassW (for Unicode character set).
 	RegisterClass(&window_class);
-	
+
 
 	//3. Create Window
 
@@ -125,7 +125,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	// Call query performance frequency function
 	//this function returns how many cycles in one second
-	float performance_frequency; 
+	float performance_frequency;
 	{
 		LARGE_INTEGER perf;
 		QueryPerformanceFrequency(&perf);
@@ -134,37 +134,37 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 
 	//Game Loop
-	while (running) 
+	while (running)
 	{
 		//Input
 		MSG message;
-		
+
 		// Reset the change the beginning of every frame
 		//because you only want to change to last one frame
 		// so whenever we start a new frame we're good to run through all the buttons and set the change to false
-		for (int i = 0; i < BUTTON_COUNT; i++) 
+		for (int i = 0; i < BUTTON_COUNT; i++)
 		{
 			input.buttons[i].changed = false;
 		}
 
 
-		while (PeekMessage(&message, window, 0, 0, PM_REMOVE)) 
+		while (PeekMessage(&message, window, 0, 0, PM_REMOVE))
 		{
-			switch(message.message) 
+			switch (message.message)
 			{
-				case WM_KEYUP:
-				case WM_KEYDOWN:
-				{
-					// we need to extract two things from this message
-				   // 1.what key is pressed?, Since we are processing them together
-					u32 vk_code = (u32)message.wParam;
+			case WM_KEYUP:
+			case WM_KEYDOWN:
+			{
+				// we need to extract two things from this message
+			   // 1.what key is pressed?, Since we are processing them together
+				u32 vk_code = (u32)message.wParam;
 
-					// 2. we need to knw if it was a key up or key down event
-					bool is_down = ((message.lParam & (1 << 31)) == 0);
+				// 2. we need to knw if it was a key up or key down event
+				bool is_down = ((message.lParam & (1 << 31)) == 0);
 
-						//Define a macro called "process_button" that takes two arguments:
-						// The macro updates the state of the specified button based on whether it is pressed or released.
-						#define process_button(b, vk)\
+				//Define a macro called "process_button" that takes two arguments:
+				// The macro updates the state of the specified button based on whether it is pressed or released.
+#define process_button(b, vk)\
 						case vk: {\
 							input.buttons[b].is_down = is_down;\
 							input.buttons[b].changed = true;\
@@ -172,26 +172,26 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 					//The backslash '\' ensures that the entire macro definition is treated as a single logical line during macro expansion.
 
-					switch (vk_code) 
-					{
-						process_button(BUTTON_UP, VK_UP);
-						process_button(BUTTON_DOWN, VK_DOWN);
-						process_button(BUTTON_W, 'W');
-						process_button(BUTTON_S, 'S');
-					}
-
-				}break;
-
-				default: 
+				switch (vk_code)
 				{
+					process_button(BUTTON_UP, VK_UP);
+					process_button(BUTTON_DOWN, VK_DOWN);
+					process_button(BUTTON_W, 'W');
+					process_button(BUTTON_S, 'S');
+				}
 
-					TranslateMessage(&message);
+			}break;
 
-					DispatchMessage(&message);
+			default:
+			{
 
-				}break;
+				TranslateMessage(&message);
+
+				DispatchMessage(&message);
+
+			}break;
 			}
-			
+
 
 		}
 
@@ -205,7 +205,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		//As we have a render_state.memory we need to save to windows and ask to use it 
 		// to do that we need the function called StretchDIBits();
 		// Now we will have perfect black screen, we have black because our render_state.memory is Zeroed out. 
-		StretchDIBits(hdc, 0, 0, render_state.width, render_state.height, 0, 0, render_state.width, render_state.height,render_state.memory, &render_state.bitmap_info, DIB_RGB_COLORS, SRCCOPY);
+		StretchDIBits(hdc, 0, 0, render_state.width, render_state.height, 0, 0, render_state.width, render_state.height, render_state.memory, &render_state.bitmap_info, DIB_RGB_COLORS, SRCCOPY);
 
 		//counter at the end of the frame 
 		//CPU time
@@ -220,7 +220,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		frame_begin_time = frame_end_time; //new frame
 
-	}	
+	}
 
-	// BASIC GAME ENGINE IS READY TO PROGRAM THE GAME 
+	//^^^^^^^^ BASIC GAME ENGINE IS READY TO PROGRAM THE GAME (above this line) ^^^^^^^^^^^^ 
 }
+
