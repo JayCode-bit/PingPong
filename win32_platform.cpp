@@ -83,6 +83,9 @@ LRESULT CALLBACK window_callback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 //entry point for graphical windows based application
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
+
+	ShowCursor(FALSE);
+
 	//First thing to do is to show a window so we can draw on that
 	//In order to draw a window on windows we need 03 things
 
@@ -109,6 +112,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 
 	HWND window = CreateWindow(window_class.lpszClassName, TEXT("Ping Pong"), WS_OVERLAPPEDWINDOW | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, 1280, 720, 0, 0, hInstance, 0);
+	{
+		//Game FullScreen
+		SetWindowLong(window, GWL_STYLE, GetWindowLong(window, GWL_STYLE) & ~WS_OVERLAPPEDWINDOW);
+		MONITORINFO mi = { sizeof(mi)};
+		GetMonitorInfo(MonitorFromWindow(window, MONITOR_DEFAULTTOPRIMARY), &mi);
+		SetWindowPos(window, HWND_TOP, mi.rcMonitor.left, mi.rcMonitor.top, mi.rcMonitor.right - mi.rcMonitor.left, mi.rcMonitor.bottom - mi.rcMonitor.top,SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+	}
 	HDC hdc = GetDC(window);
 
 	//create Input Struct and zero that out
@@ -178,6 +188,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 					process_button(BUTTON_DOWN, VK_DOWN);
 					process_button(BUTTON_W, 'W');
 					process_button(BUTTON_S, 'S');
+					process_button(BUTTON_LEFT, VK_LEFT);
+					process_button(BUTTON_RIGHT, VK_RIGHT);
+					process_button(BUTTON_ENTER, VK_RETURN);
 				}
 
 			}break;

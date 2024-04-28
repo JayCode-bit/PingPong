@@ -12,6 +12,9 @@ enum
 	BUTTON_DOWN,
 	BUTTON_W,
 	BUTTON_S,
+	BUTTON_LEFT,
+	BUTTON_RIGHT,
+	BUTTON_ENTER,
 
 	BUTTON_COUNT, //should be the last item
 };
